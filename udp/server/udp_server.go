@@ -6,7 +6,7 @@ import (
 	"syscall"
 )
 
-type udpPacket struct {
+type UDPPacket struct {
 	BytesRecieved int
 	ClientAddress syscall.SockaddrInet4
 	Err           error
@@ -61,7 +61,7 @@ func main() {
 			return
 		}
 
-		tempPacket := udpPacket{bytes, *clientAddressIPv4, err}
+		tempPacket := UDPPacket{bytes, *clientAddressIPv4, err}
 		message := string(buffer[:tempPacket.BytesRecieved])
 		fmt.Printf("Message from client in packet #%d: %s\n", i, message)
 
