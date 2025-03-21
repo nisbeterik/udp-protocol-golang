@@ -4,7 +4,7 @@ import (
 	"fmt"
 	// "os"
 	"syscall"
-	)
+)
 
 type udpPacket struct {
 	BytesRecieved int
@@ -12,26 +12,40 @@ type udpPacket struct {
 	Err error
 }
 
+type UDPSocket struct {
+	FileDescriptor int
+	ServerAddress syscall.SockaddrInet4
+}
+
 
 func main() {
 
 	buffer := make([]byte, 512) // buffer to store packet data in
 	
+	var udpSocket UDPSocket // udpSocket object
+	var err error	// err variable
+
+    fmt.Println("Creating server socket...")
+	// Create socket
+	err = createSocket(&udpSocket)
+	if err != nil {
+		fmt.Println("Error creating socket:", err)
+		return
+	}
+
+
+
 	fmt.Println("Creating server socket...")
 	//  Create socket
 	// IPv4, UDP Socket, UDP
-	udpSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
-	if err != nil {
-		fmt.Println("Error creating socket", err)
-		return
-	}
+	
 	// set address that socket will bind to
 	addr := &syscall.SockaddrInet4{
 		Port: 8080,					// bind socket to port 8080
 		Addr: [4]byte{127,0,0,1},	// set it to interface only with localhost
 	}
 
-	
+	/*
 	fmt.Println("Binding socket..:")	
 	err = syscall.Bind(udpSocket, addr) // bind the socket to the address/port. this will route traffic to the socket
 	if err != nil {
@@ -59,5 +73,18 @@ func main() {
 	message := string(buffer[:tempPacket.BytesRecieved])
 	fmt.Println("Message from client: " + message)
 	syscall.Close(udpSocket)
-	fmt.Println("Closing server...")
+	fmt.Println("Closing server...")*/
+}
+
+
+// Function creates socket and sets the filedescriptor within the object 
+func createSocket(udpSocket *UDPSocket) error {
+
+	var err error
+	udpSocket.FileDescriptor, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
+	if err != nil {
+		fmt.Println("Error creating socket", err)
+		return err
+	}
+	return nil
 }

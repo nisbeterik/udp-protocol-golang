@@ -5,6 +5,7 @@ import (
 	"syscall"
 )
 
+
 func main() {
 
 	// Client socket to use to send data
@@ -35,3 +36,4 @@ func main() {
  	syscall.Close(clientUdpSocket)
 	fmt.Println("Closing client...")
 }
+
