@@ -8,7 +8,7 @@ import (
 
 type udpPacket struct {
 	BytesRecieved int
-	ClientAddress syscall.Sockaddr
+	ClientAddress syscall.SockaddrInet4
 	Err error
 }
 
@@ -37,12 +37,20 @@ func main() {
 		return
 	}
 
-	bytes, client_address, err :=	syscall.Recvfrom(udpSocket, buffer, 0)
+	bytes, clientAddress, err :=	syscall.Recvfrom(udpSocket, buffer, 0)
 	if err != nil {
 		fmt.Println("Error receiving data:", err)
 		return
 	}
 
-	tempPacket := udpPacket{bytes, client_address, err}
+	clientAddressIPv4, ok := clientAddress.(*syscall.SockaddrInet4)
+	if !ok {
+		fmt.Println("Client address type incorrect")
+		return
+	}
+
+
+	tempPacket := udpPacket{bytes, *clientAddressIPv4, err}
 	fmt.Println(tempPacket)
+	syscall.Close(udpSocket)
 }
