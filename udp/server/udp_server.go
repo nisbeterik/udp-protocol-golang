@@ -53,8 +53,11 @@ func main() {
 		return
 	}
 
-	
+
 	tempPacket := udpPacket{bytes, *clientAddressIPv4, err}
 	fmt.Println(tempPacket)
+	message := string(buffer[:tempPacket.BytesRecieved])
+	fmt.Println("Message from client: " + message)
 	syscall.Close(udpSocket)
+	fmt.Println("Closing server...")
 }
