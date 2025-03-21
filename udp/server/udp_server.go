@@ -35,15 +35,18 @@ func main() {
 
 
 
-	fmt.Println("Creating server socket...")
+	
 	//  Create socket
 	// IPv4, UDP Socket, UDP
-	
+
 	// set address that socket will bind to
-	addr := &syscall.SockaddrInet4{
-		Port: 8080,					// bind socket to port 8080
-		Addr: [4]byte{127,0,0,1},	// set it to interface only with localhost
+	err = setAddress(&udpSocket, 8080, [4]byte{127,0,0,1})
+	if err != nil {
+		fmt.Println("Error setting address", err)
+		return
 	}
+
+	
 
 	/*
 	fmt.Println("Binding socket..:")	
@@ -86,5 +89,16 @@ func createSocket(udpSocket *UDPSocket) error {
 		fmt.Println("Error creating socket", err)
 		return err
 	}
+	return nil
+}
+
+// Function sets the address of the socket
+// checks if the port number is valid
+func setAddress(udpSocket *UDPSocket, port int, ip [4]byte) error {
+	if port < 0 || port > 0xFFFF {
+		return fmt.Errorf("Invalid port number: %d, must between 0 and %d", port, 0xFFFF)
+	}
+	udpSocket.ServerAddress.Port = port
+	udpSocket.ServerAddress.Addr = ip
 	return nil
 }
