@@ -51,14 +51,14 @@ func main() {
 		bytes, clientAddress, err := syscall.Recvfrom(udpSocket.FileDescriptor, buffer, 0)
 		if err != nil {
 			fmt.Println("Error receiving data:", err)
-			return
+			break
 		}
 
 		fmt.Println("Packet received!")
 		clientAddressIPv4, ok := clientAddress.(*syscall.SockaddrInet4)
 		if !ok {
 			fmt.Println("Client address type incorrect")
-			return
+			break
 		}
 
 		tempPacket := UDPPacket{bytes, *clientAddressIPv4, err}
