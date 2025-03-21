@@ -15,5 +15,12 @@ func main() {
 		fmt.Println("Error creating socket", err)
 		return
 	}
-	fmt.Println("Udp socket: ", udpSocket)
+
+	addr := &syscall.SockaddrInet4{
+		Port: 8080,					// bind socket to port 8080
+		Addr: [4]byte{127,0,0,1},	// set it to interface only with localhost
+	}
+	
+	syscall.Bind(udpSocket, addr) // bind the socket to the address/port. this will route traffic to the socket
+
 }
