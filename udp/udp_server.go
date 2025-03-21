@@ -31,9 +31,17 @@ func main() {
 
 	
 	
-	syscall.Bind(udpSocket, addr) // bind the socket to the address/port. this will route traffic to the socket
+	err = syscall.Bind(udpSocket, addr) // bind the socket to the address/port. this will route traffic to the socket
+	if err != nil {
+		fmt.Println("Error binding sockets:", err)
+		return
+	}
 
 	bytes, client_address, err :=	syscall.Recvfrom(udpSocket, buffer, 0)
+	if err != nil {
+		fmt.Println("Error receiving data:", err)
+		return
+	}
 
 	tempPacket := udpPacket{bytes, client_address, err}
 	fmt.Println(tempPacket)
