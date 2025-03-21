@@ -9,22 +9,20 @@ import (
 type udpPacket struct {
 	BytesRecieved int
 	ClientAddress syscall.SockaddrInet4
-	Err error
+	Err           error
 }
 
 type UDPSocket struct {
 	FileDescriptor int
-	ServerAddress syscall.SockaddrInet4
+	ServerAddress  syscall.SockaddrInet4
 }
-
 
 func main() {
 
 	buffer := make([]byte, 512) // buffer to store packet data in
-	
-	var udpSocket UDPSocket // udpSocket object
-	var err error	// err variable
 
+	var udpSocket UDPSocket // udpSocket object
+	var err error           // err variable
 
 	// Create socket, IPv4
 	err = createSocket(&udpSocket)
@@ -33,19 +31,13 @@ func main() {
 		return
 	}
 
-
 	// set address that socket will bind to
 	// Port 8080 and local host ip
-	err = setAddress(&udpSocket, 8080, [4]byte{127,0,0,1})
+	err = setAddress(&udpSocket, 8080, [4]byte{127, 0, 0, 1})
 	if err != nil {
 		fmt.Println("Error setting address", err)
 		return
 	}
-
-
-
-	counter := 0
-	fmt.Println(counter)
 
 	err = bindSocket(&udpSocket)
 	if err != nil {
@@ -53,32 +45,33 @@ func main() {
 		return
 	}
 
+	for i := 1; i <= 10; i++ {
 
-	fmt.Println("Listening for packets...")
-	bytes, clientAddress, err :=	syscall.Recvfrom(udpSocket.FileDescriptor, buffer, 0)
-	if err != nil {
-		fmt.Println("Error receiving data:", err)
-		return
+		fmt.Println("Listening for packets...")
+		bytes, clientAddress, err := syscall.Recvfrom(udpSocket.FileDescriptor, buffer, 0)
+		if err != nil {
+			fmt.Println("Error receiving data:", err)
+			return
+		}
+
+		fmt.Println("Packet received!")
+		clientAddressIPv4, ok := clientAddress.(*syscall.SockaddrInet4)
+		if !ok {
+			fmt.Println("Client address type incorrect")
+			return
+		}
+
+		tempPacket := udpPacket{bytes, *clientAddressIPv4, err}
+		message := string(buffer[:tempPacket.BytesRecieved])
+		fmt.Printf("Message from client in packet #%d: %s\n", i, message)
+
 	}
 
-	fmt.Println("Packet received!")
-	clientAddressIPv4, ok := clientAddress.(*syscall.SockaddrInet4)
-	if !ok {
-		fmt.Println("Client address type incorrect")
-		return
-	}
-
-
-	tempPacket := udpPacket{bytes, *clientAddressIPv4, err}
-	fmt.Println(tempPacket)
-	message := string(buffer[:tempPacket.BytesRecieved])
-	fmt.Println("Message from client: " + message)
 	syscall.Close(udpSocket.FileDescriptor) // close socket when server is done
 	fmt.Println("Closing server...")
 }
 
-
-// Function creates socket and sets the filedescriptor within the object 
+// Function creates socket and sets the filedescriptor within the object
 func createSocket(udpSocket *UDPSocket) error {
 
 	fmt.Println("Creating socket...")
@@ -96,7 +89,7 @@ func createSocket(udpSocket *UDPSocket) error {
 // checks if the port number is valid
 func setAddress(udpSocket *UDPSocket, port int, ip [4]byte) error {
 
-	fmt.Println("Setting address...")	
+	fmt.Println("Setting address...")
 	if port < 0 || port > 0xFFFF {
 		return fmt.Errorf("invalid port number: %d, must between 0 and %d", port, 0xFFFF)
 	}
@@ -114,5 +107,5 @@ func bindSocket(udpSocket *UDPSocket) error {
 		fmt.Println("Error binding socket:", err)
 		return err
 	}
-	return nil 
+	return nil
 }
