@@ -25,8 +25,8 @@ func main() {
 	var udpSocket UDPSocket // udpSocket object
 	var err error	// err variable
 
-    fmt.Println("Creating server socket...")
-	// Create socket
+
+	// Create socket, IPv4
 	err = createSocket(&udpSocket)
 	if err != nil {
 		fmt.Println("Error creating socket:", err)
@@ -34,19 +34,15 @@ func main() {
 	}
 
 
-
-	
-	//  Create socket
-	// IPv4, UDP Socket, UDP
-
 	// set address that socket will bind to
+	// Port 8080 and local host ip
 	err = setAddress(&udpSocket, 8080, [4]byte{127,0,0,1})
 	if err != nil {
 		fmt.Println("Error setting address", err)
 		return
 	}
 
-	
+
 
 	/*
 	fmt.Println("Binding socket..:")	
@@ -83,22 +79,39 @@ func main() {
 // Function creates socket and sets the filedescriptor within the object 
 func createSocket(udpSocket *UDPSocket) error {
 
+	fmt.Println("Creating socket...")
 	var err error
 	udpSocket.FileDescriptor, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
 	if err != nil {
 		fmt.Println("Error creating socket", err)
 		return err
 	}
+	fmt.Println("Socket created!")
 	return nil
 }
 
 // Function sets the address of the socket
 // checks if the port number is valid
 func setAddress(udpSocket *UDPSocket, port int, ip [4]byte) error {
+
+	fmt.Println("Setting address...")	
 	if port < 0 || port > 0xFFFF {
 		return fmt.Errorf("Invalid port number: %d, must between 0 and %d", port, 0xFFFF)
 	}
+
 	udpSocket.ServerAddress.Port = port
 	udpSocket.ServerAddress.Addr = ip
+	fmt.Println("Address set!")
 	return nil
+}
+
+func bindSocket(udpSocket *UDPSocket) error {
+	fmt.Println("Binding socket...")
+	var err error
+	err = syscall.Bind(udpSocket.FileDescriptor, &udpSocket.ServerAddress)
+	if err != nil {
+		fmt.Println("Error binding socket:", err)
+		return err
+	}
+	return nil 
 }
