@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	// "os"
+	"sync"
 	"syscall"
 	"github.com/nisbeterik/tcp-udp-golang/udp/packetHandler"
 )
@@ -18,7 +19,7 @@ func main() {
 
 	var udpSocket UDPSocket // udpSocket object
 	var err error           // err variable
-
+	var wg sync.WaitGroup
 	// Create socket, IPv4
 	err = createSocket(&udpSocket)
 	if err != nil {
@@ -50,10 +51,14 @@ func main() {
 		}
 		
 		fmt.Println("Packet received!")
-		go packetHandler.ProcessPacket(bytes, clientAddress, string(buffer[:bytes]), err)
+		wg.Add(1)
+		go func(bytes int, clientAddress syscall.Sockaddr, data string, err error) {
+			defer wg.Done()
+			packetHandler.ProcessPacket(bytes, clientAddress, data, err)
+		}(bytes, clientAddress, string(buffer[:bytes]), err)
 
 	}
-
+	wg.Wait()
 	syscall.Close(udpSocket.FileDescriptor) // close socket when server is done
 	fmt.Println("Closing server...")
 }
