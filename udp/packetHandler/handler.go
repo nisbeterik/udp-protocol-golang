@@ -15,6 +15,7 @@ type UDPPacket struct {
 
 func ProcessPacket(bytes int, clientAddress syscall.Sockaddr, message string, err error) {
 	var packet UDPPacket
+	packet.Err = err
 	clientAddressIPv4, err := extractIPv4(clientAddress)
 	if err != nil {
 		fmt.Println("Error processing packet")
@@ -23,7 +24,6 @@ func ProcessPacket(bytes int, clientAddress syscall.Sockaddr, message string, er
 	packet.ClientAddress = *clientAddressIPv4
 	packet.BytesRecieved = bytes
 	packet.Message = message
-	packet.Err = err
 	printMessage(packet)
 }
 

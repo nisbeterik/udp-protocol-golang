@@ -52,8 +52,6 @@ func main() {
 		fmt.Println("Packet received!")
 		packetHandler.ProcessPacket(bytes, clientAddress, string(buffer[:bytes]), err)
 
-		// tempPacket := packetHandler.UDPPacket{bytes, *clientAddressIPv4, err}
-		
 	}
 
 	syscall.Close(udpSocket.FileDescriptor) // close socket when server is done
