@@ -50,7 +50,7 @@ func main() {
 		}
 		
 		fmt.Println("Packet received!")
-		packetHandler.ProcessPacket(bytes, clientAddress, string(buffer[:bytes]), err)
+		go packetHandler.ProcessPacket(bytes, clientAddress, string(buffer[:bytes]), err)
 
 	}
 

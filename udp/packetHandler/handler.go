@@ -4,6 +4,7 @@ import (
 	"fmt"
 	// "log"
 	"syscall"
+	"time"
 )
 
 type UDPPacket struct {
@@ -24,6 +25,7 @@ func ProcessPacket(bytes int, clientAddress syscall.Sockaddr, message string, er
 	packet.ClientAddress = *clientAddressIPv4
 	packet.BytesRecieved = bytes
 	packet.Message = message
+	time.Sleep(3 * time.Second)
 	printMessage(packet)
 }
 
