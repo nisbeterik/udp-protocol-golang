@@ -4,13 +4,8 @@ import (
 	"fmt"
 	// "os"
 	"syscall"
+	"github.com/nisbeterik/tcp-udp-golang/udp/packetHandler"
 )
-
-type UDPPacket struct {
-	BytesRecieved int
-	ClientAddress syscall.SockaddrInet4
-	Err           error
-}
 
 type UDPSocket struct {
 	FileDescriptor int
@@ -53,18 +48,12 @@ func main() {
 			fmt.Println("Error receiving data:", err)
 			break
 		}
-
+		
 		fmt.Println("Packet received!")
-		clientAddressIPv4, ok := clientAddress.(*syscall.SockaddrInet4)
-		if !ok {
-			fmt.Println("Client address type incorrect")
-			break
-		}
+		packetHandler.ProcessPacket(bytes, clientAddress, string(buffer[:bytes]), err)
 
-		tempPacket := UDPPacket{bytes, *clientAddressIPv4, err}
-		message := string(buffer[:tempPacket.BytesRecieved])
-		fmt.Printf("Message from client in packet #%d: %s\n", i, message)
-
+		// tempPacket := packetHandler.UDPPacket{bytes, *clientAddressIPv4, err}
+		
 	}
 
 	syscall.Close(udpSocket.FileDescriptor) // close socket when server is done
