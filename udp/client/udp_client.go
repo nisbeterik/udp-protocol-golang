@@ -6,7 +6,17 @@ import (
 )
 
 func main() {
-	buffer := make([]byte, 512)
+	buffer := make([]byte, 512)	
+	fmt.Println("Enter the server IP address")
+	ip := [4]byte{0, 0, 0, 0,}
+
+	fmt.Scanln(&ip[0], &ip[1], &ip[2], &ip[3])
+
+	
+	fmt.Println("Enter the server port")
+	port := 0
+	fmt.Scanln(&port)
+
 	// Client socket to use to send data
 	// Same structure as server socket
 	fmt.Println("Creating client socket")
@@ -18,8 +28,8 @@ func main() {
 
 	// Address client will send packet to
 	serverAddr := &syscall.SockaddrInet4{
-		Port: 8080,
-		Addr: [4]byte{127, 0, 0, 1},
+		Port: port,
+		Addr: ip,
 	}
 
 	message := []byte("This is a message from the client") // Message to send
