@@ -1,21 +1,26 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"syscall"
 )
 
 func main() {
-	buffer := make([]byte, 512)	
+	buffer := make([]byte, 512)
 	fmt.Println("Enter the server IP address")
-	ip := [4]byte{0, 0, 0, 0,}
+	ip := [4]byte{0, 0, 0, 0}
 
 	fmt.Scanln(&ip[0], &ip[1], &ip[2], &ip[3])
 
-	
 	fmt.Println("Enter the server port")
 	port := 0
 	fmt.Scanln(&port)
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter a message you want to send")
+	message, _ := reader.ReadBytes('\n')
 
 	// Client socket to use to send data
 	// Same structure as server socket
@@ -31,8 +36,6 @@ func main() {
 		Port: port,
 		Addr: ip,
 	}
-
-	message := []byte("This is a message from the client") // Message to send
 
 	fmt.Println("Sending packet...")
 	err = syscall.Sendto(clientUdpSocket, message, 0, serverAddr)

@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	// "os"
+	"github.com/nisbeterik/tcp-udp-golang/udp/packetHandler"
 	"sync"
 	"syscall"
-	"github.com/nisbeterik/tcp-udp-golang/udp/packetHandler"
 )
 
 type UDPSocket struct {
@@ -49,12 +49,12 @@ func main() {
 			fmt.Println("Error receiving data:", err)
 			break
 		}
-		
+
 		fmt.Println("Packet received!")
 		wg.Add(1)
 		go func(bytes int, clientAddress syscall.Sockaddr, data string, err error) {
 			defer wg.Done()
-			packetHandler.ProcessPacket(udpSocket.FileDescriptor,bytes, clientAddress, data, err)
+			packetHandler.ProcessPacket(udpSocket.FileDescriptor, bytes, clientAddress, data, err)
 		}(bytes, clientAddress, string(buffer[:bytes]), err)
 
 	}
