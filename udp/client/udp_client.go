@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+
+	// TODO: refactor this file to 
+	// be more modular and readable
 	buffer := make([]byte, 512)
 	fmt.Println("Enter the server IP address")
 	ip := [4]byte{0, 0, 0, 0}
