@@ -21,8 +21,6 @@ Both implementations have their respective client implementations to interact wi
 - Open a new terminal
 - Navigate to where you stored the root of the project e.g. ``cd Desktop/tcp-udp-golang``
 - Start the client by running ``go run ./udp/client/udp_client.go``
-- Now your client is running
-- Follow the instructions by entering "127 0 0 1" as the server IP address
-- Then enter "8080" as the server port
-- Enter your message to the server
-- Wait for the server's response!
+- In the console, enter "127 0 0 1" as the server address
+- Enter "8080" as the server port
+- Enter your message to the server then wait for the server's response!
