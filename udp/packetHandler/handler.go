@@ -14,7 +14,7 @@ type UDPPacket struct {
 	Err           error
 }
 
-func ProcessPacket(bytes int, clientAddress syscall.Sockaddr, message string, err error) {
+func ProcessPacket(fd int, bytes int, clientAddress syscall.Sockaddr, message string, err error) {
 	var packet UDPPacket
 	packet.Err = err
 	clientAddressIPv4, err := extractIPv4(clientAddress)
@@ -27,6 +27,11 @@ func ProcessPacket(bytes int, clientAddress syscall.Sockaddr, message string, er
 	packet.Message = message
 	time.Sleep(3 * time.Second)
 	printMessage(packet)
+	err = sendResponse(packet.ClientAddress, fd)
+	if err != nil {
+		fmt.Println("Error sending response")
+		return
+	}
 }
 
 func extractIPv4(clientAddress syscall.Sockaddr) (*syscall.SockaddrInet4, error) {
@@ -42,3 +47,13 @@ func printMessage(packet UDPPacket) {
 	fmt.Printf("Bytes received: %d\n", packet.BytesRecieved)
 	fmt.Println("Message from client: " + packet.Message)
 }
+
+func sendResponse(clientAddress syscall.SockaddrInet4, fd int) error {
+	response := []byte("Response from server")
+	err := syscall.Sendto(fd, response, 0, &clientAddress)
+	if err != nil {
+		return fmt.Errorf("error responding to client")
+	}
+	return nil
+}
+
