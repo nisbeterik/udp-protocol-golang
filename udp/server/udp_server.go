@@ -54,7 +54,7 @@ func main() {
 		wg.Add(1)
 		go func(bytes int, clientAddress syscall.Sockaddr, data string, err error) {
 			defer wg.Done()
-			packetHandler.ProcessPacket(udpSocket.FileDescriptor, bytes, clientAddress, data, err)
+			packetHandler.ProcessPacket(udpSocket.FileDescriptor,bytes, clientAddress, data, err)
 		}(bytes, clientAddress, string(buffer[:bytes]), err)
 
 	}
