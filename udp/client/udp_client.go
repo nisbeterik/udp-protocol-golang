@@ -25,10 +25,9 @@ func main() {
 	// Address client will send packet to
 	serverAddr := setServerAddress(port, ip)
 
-	fmt.Println("Sending packet...")
-	err = syscall.Sendto(clientUdpSocket, message, 0, serverAddr)
+	err = sendPacket(clientUdpSocket, message, serverAddr)
 	if err != nil {
-		fmt.Println("Error sending packet")
+		fmt.Println("Error sending packet:", err)
 		return
 	}
 
@@ -85,4 +84,9 @@ func setServerAddress(port int, ip [4]byte) *syscall.SockaddrInet4 {
 		Port: port,
 		Addr: ip,
 	}
+}
+
+func sendPacket(fd int, message []byte, addr *syscall.SockaddrInet4) error {
+	fmt.Println("Sending packet...")
+	return syscall.Sendto(fd, message, 0, addr)
 }
