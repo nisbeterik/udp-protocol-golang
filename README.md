@@ -1,7 +1,6 @@
-# tcp-udp-golang
+# udp-protocol-golang
 
-This repo is a monorepo of a TCP server and a UDP server written i golang. 
-Both implementations have their respective client implementations to interact with the servers.
+This repo is a monorepo of a UDP server written in golang
 
 ## Requirements
 - [Golang 1.22.1](https://go.dev/)
