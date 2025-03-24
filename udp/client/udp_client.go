@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-
+	// TODO: Send packet using raw sockets that form valid UDP headers.
 	buffer := make([]byte, 512) // buffer to parse server response
 	ip, port, message, err := enterDetails()
 	if err != nil {
