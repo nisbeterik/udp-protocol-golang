@@ -18,12 +18,9 @@ func main() {
 		
 	}
 
-	// Client socket to use to send data
-	// Same structure as server socket
-	fmt.Println("Creating client socket")
-	clientUdpSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
+	clientUdpSocket, err := createSocket()
 	if err != nil {
-		fmt.Println("Error creating socket:", err)
+		fmt.Println("Error creating client socket:", err)
 		return
 	}
 
@@ -76,4 +73,14 @@ func enterDetails() ([4]byte, int, []byte, error){
 	}
 	return ip, port, message, nil
 
+}
+
+func createSocket() (int, error) {
+	fmt.Println("Creating client socket")
+	clientUdpSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
+	if err != nil {
+		fmt.Println("Error creating socket:", err)
+		return -1, err
+	}
+	return clientUdpSocket, nil
 }
