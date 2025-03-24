@@ -32,16 +32,11 @@ func main() {
 	}
 
 	fmt.Println("Packet sent!")
-	fmt.Println("Waiting for response...")
-	bytes, serverAddress, err := syscall.Recvfrom(clientUdpSocket, buffer, 0)
+	err = getResponse(clientUdpSocket, buffer)
 	if err != nil {
-		fmt.Println("Error receiving response:", err)
+		fmt.Println("Error waiting for response", err)
 		return
 	}
-	fmt.Println("Message received!")
-	fmt.Println(string(buffer[:bytes]))
-	addr := serverAddress.(*syscall.SockaddrInet4)
-	fmt.Printf("From server: %v:%v\n", addr.Addr, addr.Port)
 
 	syscall.Close(clientUdpSocket)
 	fmt.Println("Closing client...")
@@ -89,4 +84,16 @@ func setServerAddress(port int, ip [4]byte) *syscall.SockaddrInet4 {
 func sendPacket(fd int, message []byte, addr *syscall.SockaddrInet4) error {
 	fmt.Println("Sending packet...")
 	return syscall.Sendto(fd, message, 0, addr)
+}
+
+func getResponse(fd int, buf []byte) (error) {
+	bytes, serverAddress, err := syscall.Recvfrom(fd, buf, 0)
+	if err != nil {
+		return fmt.Errorf("error receiving response")
+	}
+	fmt.Println("Message received!")
+	fmt.Println(string(buf[:bytes]))
+	addr := serverAddress.(*syscall.SockaddrInet4)
+	fmt.Printf("From server: %v:%v\n", addr.Addr, addr.Port)
+	return nil
 }
