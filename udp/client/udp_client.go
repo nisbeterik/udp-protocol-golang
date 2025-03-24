@@ -9,21 +9,14 @@ import (
 
 func main() {
 
-	// TODO: refactor this file to 
-	// be more modular and readable
 	buffer := make([]byte, 512)
-	fmt.Println("Enter the server IP address")
-	ip := [4]byte{0, 0, 0, 0}
+	ip, port, message, err := enterDetails()
+	if err != nil {
 
-	fmt.Scanln(&ip[0], &ip[1], &ip[2], &ip[3])
-
-	fmt.Println("Enter the server port")
-	port := 0
-	fmt.Scanln(&port)
-
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter a message you want to send")
-	message, _ := reader.ReadBytes('\n')
+		fmt.Println("Error entering details:", err)
+		return
+		
+	}
 
 	// Client socket to use to send data
 	// Same structure as server socket
@@ -61,4 +54,26 @@ func main() {
 
 	syscall.Close(clientUdpSocket)
 	fmt.Println("Closing client...")
+}
+
+func enterDetails() ([4]byte, int, []byte, error){
+	fmt.Println("Enter the server IP address")
+	ip := [4]byte{0, 0, 0, 0}
+
+	fmt.Scanln(&ip[0], &ip[1], &ip[2], &ip[3])
+
+	fmt.Println("Enter the server port")
+	port := 0
+	fmt.Scanln(&port)
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter a message you want to send")
+	message, err := reader.ReadBytes('\n')
+	if err != nil {
+
+		fmt.Println("error entering message:", err)
+		return ip, -1, nil, err
+	}
+	return ip, port, message, nil
+
 }
