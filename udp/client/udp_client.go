@@ -9,13 +9,11 @@ import (
 
 func main() {
 
-	buffer := make([]byte, 512)
+	buffer := make([]byte, 512) // buffer to parse server response
 	ip, port, message, err := enterDetails()
 	if err != nil {
-
 		fmt.Println("Error entering details:", err)
 		return
-		
 	}
 
 	clientUdpSocket, err := createSocket()
@@ -25,10 +23,7 @@ func main() {
 	}
 
 	// Address client will send packet to
-	serverAddr := &syscall.SockaddrInet4{
-		Port: port,
-		Addr: ip,
-	}
+	serverAddr := setServerAddress(port, ip)
 
 	fmt.Println("Sending packet...")
 	err = syscall.Sendto(clientUdpSocket, message, 0, serverAddr)
@@ -83,4 +78,11 @@ func createSocket() (int, error) {
 		return -1, err
 	}
 	return clientUdpSocket, nil
+}
+
+func setServerAddress(port int, ip [4]byte) *syscall.SockaddrInet4 {
+	return &syscall.SockaddrInet4{
+		Port: port,
+		Addr: ip,
+	}
 }
