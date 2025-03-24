@@ -6,6 +6,9 @@ import (
 	"github.com/nisbeterik/tcp-udp-golang/udp/packetHandler"
 	"sync"
 	"syscall"
+	"os"
+	"net"
+	"strconv"
 )
 
 type UDPSocket struct {
@@ -16,9 +19,21 @@ type UDPSocket struct {
 func main() {
 
 	buffer := make([]byte, 512) // buffer to store packet data in
+	var port int
+	var ip [4]byte
+	var err error 
 
+	if len(os.Args) < 3 {
+		port = 8080
+		ip = [4]byte{127, 0, 0, 1}
+	} else {
+		port, ip, err = parseArguments()
+		if err != nil {
+			fmt.Println("Error parsing arguments:", err)
+			return
+		}
+	}
 	var udpSocket UDPSocket // udpSocket object
-	var err error           // err variable
 	var wg sync.WaitGroup
 	// Create socket, IPv4
 	err = createSocket(&udpSocket)
@@ -29,7 +44,7 @@ func main() {
 
 	// set address that socket will bind to
 	// Port 8080 and local host ip
-	err = setAddress(&udpSocket, 8080, [4]byte{127, 0, 0, 1})
+	err = setAddress(&udpSocket, port, ip)
 	if err != nil {
 		fmt.Println("Error setting address", err)
 		return
@@ -101,3 +116,25 @@ func bindSocket(udpSocket *UDPSocket) error {
 	}
 	return nil
 }
+
+func parseArguments() (int, [4]byte, error) {
+	num, err := strconv.Atoi(os.Args[1]) 
+	if err != nil {
+		return -1, [4]byte{}, err
+	}
+
+	ip := net.ParseIP(os.Args[2])
+	if ip == nil {
+		fmt.Println("Error parsing IP:", err)
+		return -1, [4]byte{}, err
+	}
+
+	ip4 := ip.To4()
+	if ip4 == nil {
+		fmt.Println("Error converting to IP4:", err)
+		return -1, [4]byte{}, err
+	}
+	var ipArr [4]byte
+	copy(ipArr[:], ip4)
+	return num, ipArr, nil 
+}	
