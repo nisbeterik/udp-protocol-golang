@@ -1,6 +1,6 @@
 # udp-protocol-golang
 
-This repo is a monorepo of a UDP server written in golang
+This repo is a UDP server written in Golang
 
 ## Requirements
 - [Golang 1.22.1](https://go.dev/)
