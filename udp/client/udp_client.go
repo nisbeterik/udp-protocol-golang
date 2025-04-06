@@ -1,20 +1,22 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"math/rand"
 	"syscall"
+	"time"
 )
 
 func main() {
 	// TODO: Send packet using raw sockets that form valid UDP headers.
-	buffer := make([]byte, 512) // buffer to parse server response
-	ip, port, message, err := enterDetails()
+	buffer := make([]byte, 2) // buffer to parse server response
+	ip, port, err := enterDetails()
 	if err != nil {
 		fmt.Println("Error entering details:", err)
 		return
 	}
+
+	message := genMessage()
 
 	clientUdpSocket, err := createSocket()
 	if err != nil {
@@ -42,25 +44,16 @@ func main() {
 	fmt.Println("Closing client...")
 }
 
-func enterDetails() ([4]byte, int, []byte, error){
+func enterDetails() ([4]byte, int, error) {
 	fmt.Println("Enter the server IP address")
 	ip := [4]byte{0, 0, 0, 0}
 
 	fmt.Scanln(&ip[0], &ip[1], &ip[2], &ip[3])
-
 	fmt.Println("Enter the server port")
 	port := 0
 	fmt.Scanln(&port)
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter a message you want to send")
-	message, err := reader.ReadBytes('\n')
-	if err != nil {
-
-		fmt.Println("error entering message:", err)
-		return ip, -1, nil, err
-	}
-	return ip, port, message, nil
+	return ip, port, nil
 
 }
 
@@ -86,7 +79,7 @@ func sendPacket(fd int, message []byte, addr *syscall.SockaddrInet4) error {
 	return syscall.Sendto(fd, message, 0, addr)
 }
 
-func getResponse(fd int, buf []byte) (error) {
+func getResponse(fd int, buf []byte) error {
 	bytes, serverAddress, err := syscall.Recvfrom(fd, buf, 0)
 	if err != nil {
 		return fmt.Errorf("error receiving response")
@@ -96,4 +89,13 @@ func getResponse(fd int, buf []byte) (error) {
 	addr := serverAddress.(*syscall.SockaddrInet4)
 	fmt.Printf("From server: %v:%v\n", addr.Addr, addr.Port)
 	return nil
+}
+
+func genMessage() []byte {
+
+	randSource := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(randSource)
+	num := r.Intn(0xFFFF)
+	message := []byte{byte(num >> 8), byte(num & 0xFF)}
+	return message
 }
