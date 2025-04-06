@@ -4,11 +4,11 @@ import (
 	"fmt"
 	// "os"
 	"github.com/nisbeterik/tcp-udp-golang/udp/packetHandler"
+	"net"
+	"os"
+	"strconv"
 	"sync"
 	"syscall"
-	"os"
-	"net"
-	"strconv"
 )
 
 type UDPSocket struct {
@@ -21,7 +21,7 @@ func main() {
 	buffer := make([]byte, 512) // buffer to store packet data in
 	var port int
 	var ip [4]byte
-	var err error 
+	var err error
 
 	if len(os.Args) < 3 {
 		port = 8080
@@ -57,20 +57,18 @@ func main() {
 	}
 
 	for i := 1; i <= 10; i++ {
-
 		fmt.Println("Listening for packets...")
 		bytes, clientAddress, err := syscall.Recvfrom(udpSocket.FileDescriptor, buffer, 0)
 		if err != nil {
 			fmt.Println("Error receiving data:", err)
 			break
 		}
-
 		fmt.Println("Packet received!")
 		wg.Add(1)
-		go func(bytes int, clientAddress syscall.Sockaddr, data string, err error) {
+		go func(bytes int, clientAddress syscall.Sockaddr, data []byte, err error) {
 			defer wg.Done()
 			packetHandler.ProcessPacket(udpSocket.FileDescriptor, bytes, clientAddress, data, err)
-		}(bytes, clientAddress, string(buffer[:bytes]), err)
+		}(bytes, clientAddress, buffer[:bytes], err)
 
 	}
 	wg.Wait()
@@ -118,7 +116,7 @@ func bindSocket(udpSocket *UDPSocket) error {
 }
 
 func parseArguments() (int, [4]byte, error) {
-	num, err := strconv.Atoi(os.Args[1]) 
+	num, err := strconv.Atoi(os.Args[1])
 	if err != nil {
 		return -1, [4]byte{}, err
 	}
@@ -136,5 +134,5 @@ func parseArguments() (int, [4]byte, error) {
 	}
 	var ipArr [4]byte
 	copy(ipArr[:], ip4)
-	return num, ipArr, nil 
-}	
+	return num, ipArr, nil
+}

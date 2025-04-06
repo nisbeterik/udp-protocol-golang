@@ -10,11 +10,11 @@ import (
 type UDPPacket struct {
 	BytesRecieved int
 	ClientAddress syscall.SockaddrInet4
-	Message string
+	Message       []byte
 	Err           error
 }
 
-func ProcessPacket(fd int, bytes int, clientAddress syscall.Sockaddr, message string, err error) {
+func ProcessPacket(fd int, bytes int, clientAddress syscall.Sockaddr, message []byte, err error) {
 	var packet UDPPacket
 	packet.Err = err
 	clientAddressIPv4, err := extractIPv4(clientAddress)
@@ -45,7 +45,19 @@ func extractIPv4(clientAddress syscall.Sockaddr) (*syscall.SockaddrInet4, error)
 func printMessage(packet UDPPacket) {
 	fmt.Printf("Client address: %d.%d.%d.%d:%d\n", packet.ClientAddress.Addr[0], packet.ClientAddress.Addr[1], packet.ClientAddress.Addr[2], packet.ClientAddress.Addr[3], packet.ClientAddress.Port)
 	fmt.Printf("Bytes received: %d\n", packet.BytesRecieved)
-	fmt.Println("Message from client: " + packet.Message)
+	fmt.Print("Message bytes from client (binary): ")
+	for i, b := range packet.Message {
+		if i > 0 {
+			fmt.Print(" ")
+		}
+		fmt.Printf("%08b", b)
+	}
+	fmt.Println()
+
+	if len(packet.Message) >= 2 {
+		num := (uint16(packet.Message[0]) << 8) | uint16(packet.Message[1])
+		fmt.Printf("Interpreted as number: %d\n", num)
+	}
 }
 
 func sendResponse(clientAddress syscall.SockaddrInet4, fd int) error {
@@ -56,4 +68,3 @@ func sendResponse(clientAddress syscall.SockaddrInet4, fd int) error {
 	}
 	return nil
 }
-
