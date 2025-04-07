@@ -57,6 +57,7 @@ func packTime(buf []byte) []byte {
 	buf[13] = byte(now >> 16)
 	buf[14] = byte(now >> 8)
 	buf[15] = byte(now)
+	fmt.Printf("Time: %d\n", now)
 	return buf
 }
 
@@ -80,10 +81,6 @@ func printMessage(packet UDPPacket) {
 	}
 	fmt.Println()
 
-	if len(packet.Message) >= 2 {
-		num := (uint16(packet.Message[0]) << 8) | uint16(packet.Message[1])
-		fmt.Printf("Interpreted as number: %d\n", num)
-	}
 }
 
 // Change to take UDPPacket as parameter
