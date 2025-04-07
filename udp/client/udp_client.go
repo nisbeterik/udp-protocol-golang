@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"syscall"
+	"time"
 )
 
 func main() {
 	// TODO: Send packet using raw sockets that form valid UDP headers.
-	buffer := make([]byte, 2) // buffer to parse server response
+	buffer := make([]byte, 16) // buffer to parse server response
 	ip, port, err := enterDetails()
 	if err != nil {
 		fmt.Println("Error entering details:", err)
@@ -82,11 +83,35 @@ func getResponse(fd int, buf []byte) error {
 	if err != nil {
 		return fmt.Errorf("error receiving response")
 	}
+	fmt.Printf("Bytes received: %d\n", bytes)
 	fmt.Println("Message received!")
-	fmt.Println(string(buf[:bytes]))
+	printTime(buf[:bytes])
 	addr := serverAddress.(*syscall.SockaddrInet4)
 	fmt.Printf("From server: %v:%v\n", addr.Addr, addr.Port)
 	return nil
+}
+
+func printTime(buf []byte) {
+	if len(buf) < 4 {
+		fmt.Println("Buffer too short to contain a timestamp")
+		return
+	}
+
+	now := uint32(buf[len(buf)-4])<<24 |
+		uint32(buf[len(buf)-3])<<16 |
+		uint32(buf[len(buf)-2])<<8 |
+		uint32(buf[len(buf)-1])
+
+	t := time.Unix(int64(now), 0)
+
+	location, err := time.LoadLocation("Europe/Stockholm")
+	if err != nil {
+		fmt.Println("Failed to load timezone:", err)
+		return
+	}
+
+	localTime := t.In(location)
+	fmt.Println("Swedish time:", localTime.Format("2006-01-02 15:04:05 MST"))
 }
 
 func genMessage() []byte {

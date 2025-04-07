@@ -2,7 +2,6 @@ package packetHandler
 
 import (
 	"fmt"
-	// "log"
 	"syscall"
 	"time"
 )
