@@ -22,4 +22,4 @@ This repo is a UDP server written in Golang
 - Start the client by running ``go run ./udp/client/udp_client.go``
 - In the console, enter "127 0 0 1" as the server address
 - Enter "8080" as the server port
-- Enter your message to the server then wait for the server's response!
+- Client will receive the current time in Sweden
