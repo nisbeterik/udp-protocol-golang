@@ -57,8 +57,23 @@ func packTime(buf []byte) []byte {
 	buf[13] = byte(now >> 16)
 	buf[14] = byte(now >> 8)
 	buf[15] = byte(now)
-	fmt.Printf("Time: %d\n", now)
+	printTime(now)
 	return buf
+}
+
+func printTime(now uint32) {
+	t := time.Unix(int64(now), 0)
+
+	location, err := time.LoadLocation("Europe/Stockholm")
+	if err != nil {
+
+		fmt.Println("Failed to load timezone:", err)
+		return
+	}
+
+	localTime := t.In(location)
+
+	fmt.Println("Swedish time:", localTime.Format("2006-01-02 15:04:05 MST"))
 }
 
 func extractIPv4(clientAddress syscall.Sockaddr) (*syscall.SockaddrInet4, error) {
