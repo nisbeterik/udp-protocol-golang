@@ -15,6 +15,11 @@ type UDPPacket struct {
 }
 
 func ProcessPacket(fd int, bytes int, clientAddress syscall.Sockaddr, message []byte, err error) {
+	if bytes != 16 {
+		fmt.Println("Invalid packet size")
+		return
+	}
+
 	var packet UDPPacket
 	packet.Err = err
 	clientAddressIPv4, err := extractIPv4(clientAddress)
