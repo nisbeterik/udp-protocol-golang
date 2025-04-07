@@ -92,10 +92,15 @@ func getResponse(fd int, buf []byte) error {
 }
 
 func genMessage() []byte {
+	packet := make([]byte, 16)
 
-	randSource := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(randSource)
-	num := r.Intn(0xFFFF)
-	message := []byte{byte(num >> 8), byte(num & 0xFF)}
-	return message
+	packet[0] = 0b11100011 // LI = 3, VN = 4, Mode = 3
+	packet[1] = 0          // Stratum
+	packet[2] = 6          // Poll Interval
+	packet[3] = 0xEC       // Precision
+	packet[4], packet[5], packet[6], packet[7] = 0, 0, 0, 0
+	packet[8], packet[9], packet[10], packet[11] = 0, 0, 0, 0
+	packet[12], packet[13], packet[14], packet[15] = 49, 0x4E, 49, 52 // "IN14"
+
+	return packet
 }
