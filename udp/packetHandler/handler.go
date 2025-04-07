@@ -20,23 +20,44 @@ func ProcessPacket(fd int, bytes int, clientAddress syscall.Sockaddr, message []
 		return
 	}
 
+	if message[12] != 49 || message[13] != 0x4E || message[14] != 49 || message[15] != 52 {
+		fmt.Println("Invalid magic marker")
+		return
+	}
+
 	var packet UDPPacket
 	packet.Err = err
+
 	clientAddressIPv4, err := extractIPv4(clientAddress)
 	if err != nil {
 		fmt.Println("Error processing packet")
 		return
 	}
+
 	packet.ClientAddress = *clientAddressIPv4
 	packet.BytesRecieved = bytes
+
+	message = packTime(message)
 	packet.Message = message
+
 	time.Sleep(3 * time.Second)
+
 	printMessage(packet)
-	err = sendResponse(packet.ClientAddress, fd)
+
+	err = sendResponse(packet, fd)
 	if err != nil {
 		fmt.Println("Error sending response")
 		return
 	}
+}
+
+func packTime(buf []byte) []byte {
+	now := uint32(time.Now().Unix())
+	buf[12] = byte(now >> 24)
+	buf[13] = byte(now >> 16)
+	buf[14] = byte(now >> 8)
+	buf[15] = byte(now)
+	return buf
 }
 
 func extractIPv4(clientAddress syscall.Sockaddr) (*syscall.SockaddrInet4, error) {
@@ -65,9 +86,9 @@ func printMessage(packet UDPPacket) {
 	}
 }
 
-func sendResponse(clientAddress syscall.SockaddrInet4, fd int) error {
-	response := []byte("Response from server")
-	err := syscall.Sendto(fd, response, 0, &clientAddress)
+// Change to take UDPPacket as parameter
+func sendResponse(packet UDPPacket, fd int) error {
+	err := syscall.Sendto(fd, packet.Message, 0, &packet.ClientAddress)
 	if err != nil {
 		return fmt.Errorf("error responding to client")
 	}
