@@ -1,6 +1,6 @@
 # udp-protocol-golang
 
-This repo is a UDP server written in Golang
+This repo is a UDP server written in Golang. The client sends a request to the server that returns the current time. 
 
 ## Requirements
 - [Golang 1.22.1](https://go.dev/)
